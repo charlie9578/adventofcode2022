@@ -105,11 +105,16 @@ Consult the report from the sensors you just deployed. In the row where y=200000
 
 import pandas as pd
 
+row_number = 2000000
+file_name = r"day/15/input"
+boundary_min = 0
+boundary_max = 4000000
+
 sensor_xx=[]
 sensor_yy=[]
 beacon_xx=[]
 beacon_yy=[]
-with open(r"day/15/input_test", "r") as file:
+with open(file_name, "r") as file:
 
     for line in file:
         sensor = line.split("at ")[1].split(":")[0]
@@ -131,18 +136,152 @@ print(sensor_yy[-1])
 print(beacon_xx[-1])
 print(beacon_yy[-1])
 
-dict = {"sensor_x":sensor_xx,"sensor_y":sensor_yy,"beacon_x":beacon_xx,"beacon_y":beacon_yy}
+data_dict = {"sensor_x":sensor_xx,"sensor_y":sensor_yy,"beacon_x":beacon_xx,"beacon_y":beacon_yy}
 
-df = pd.DataFrame(dict)
+df = pd.DataFrame(data_dict)
 
 df["beacon_dx"]=df["beacon_x"]-df["sensor_x"]
 df["beacon_dy"]=df["beacon_y"]-df["sensor_y"]
 
-df["distance"]=abs(df["beacon_dx"])+abs(df["beacon_dy"])
-
-print(df)
+df["distance to beacon"]=abs(df["beacon_dx"])+abs(df["beacon_dy"])
 
 min_x = df[["sensor_x","beacon_x"]].min().min()
 max_x = df[["sensor_x","beacon_x"]].max().max()
 
-row10 = range()
+df["distance to row"] = abs(row_number - df["sensor_y"])
+
+df["row reach"] = df["distance to beacon"] - df["distance to row"]
+
+def row_values(sensor_y,row_reach):
+    if row_reach>=0:
+        return list(range(sensor_y-row_reach,sensor_y+row_reach+1,1))
+    else:
+        return list()
+
+
+df["row values"] = df.apply(lambda row : row_values(row["sensor_x"],row["row reach"]), axis = 1)
+
+print(df)
+
+# print(df["row values"].values)
+
+def upack(lsts):
+    output=set()
+    for lst in lsts:
+        output=output.union(set(lst))
+    return list(output)
+
+excluded_locs = upack(df["row values"].values)
+
+print(set(range(0,20))-set(excluded_locs))
+print(len(excluded_locs))
+
+
+"""
+Your puzzle answer was 4424278.
+
+The first half of this puzzle is complete! It provides one gold star: *
+--- Part Two ---
+
+Your handheld device indicates that the distress signal is coming from a beacon nearby. The distress beacon is not detected by any sensor, but the distress beacon must have x and y coordinates each no lower than 0 and no larger than 4000000.
+
+To isolate the distress beacon's signal, you need to determine its tuning frequency, which can be found by multiplying its x coordinate by 4000000 and then adding its y coordinate.
+
+In the example above, the search space is smaller: instead, the x and y coordinates can each be at most 20. With this reduced search area, there is only a single position that could have a beacon: x=14, y=11. The tuning frequency for this distress beacon is 56000011.
+
+Find the only possible position for the distress beacon. What is its tuning frequency?
+"""
+
+import numpy as np
+
+from bokeh.plotting import figure, show
+from bokeh.models import ColumnDataSource, Grid, LinearAxis, Patches, Plot
+
+from bokeh.models import NumeralTickFormatter
+
+from bokeh.palettes import Category20
+
+from shapely.geometry import Polygon
+from shapely.ops import unary_union
+
+
+df["x_top"] = df["sensor_x"]+df["distance to beacon"]
+df["x_bot"] = df["sensor_x"]-df["distance to beacon"]
+df["y_top"] = df["sensor_y"]+df["distance to beacon"]
+df["y_bot"] = df["sensor_y"]-df["distance to beacon"]
+
+print(df)
+
+xs = []
+ys = []
+polygons=[]
+for i,row in df.iterrows():
+    
+    #print(row)
+    xpts = [row["x_top"]+0.5, row["sensor_x"], row["x_bot"]-0.5, row["sensor_x"]]
+    ypts = [row["sensor_y"], row["y_bot"]-0.5, row["sensor_y"], row["y_top"]+0.5]
+
+    poly = Polygon(zip(xpts,ypts))
+
+    xs.append(xpts)
+    ys.append(ypts)
+    polygons.append(poly)
+
+boundary = Polygon(zip([boundary_min,boundary_min,boundary_max,boundary_max],
+                    [boundary_min,boundary_max,boundary_max,boundary_min]))  
+# print(xs)
+# print(ys)
+# print(polygons)
+
+all_exclusions = unary_union(polygons)
+exclusions_in_boundary = all_exclusions.intersection(boundary)
+possible_locations = boundary.symmetric_difference(exclusions_in_boundary)
+
+print(possible_locations)
+
+TOOLTIPS = [
+    ("index", "$index"),
+    ("(x,y)", "($x{int}, $y{int})"),
+]
+
+
+source = ColumnDataSource(dict(
+        xs=xs,
+        ys=ys,
+        color=list(Category20[20])+['#1f77b4','#1f77b4','#1f77b4']    
+    )
+)
+
+source_boundary = ColumnDataSource(dict(
+        xs=[[boundary_min,boundary_min,boundary_max,boundary_max]],
+        ys=[[boundary_min,boundary_max,boundary_max,boundary_min]],
+    )
+)
+
+print(len(list(Category20[20])+['#1f77b4','#1f77b4','#1f77b4']))
+
+plot = figure(
+    title="Beacon Exclusion Zone",
+    width=900, height=900,
+    min_border=0,
+    tools="hover,reset,pan,wheel_zoom,box_zoom", 
+    tooltips=TOOLTIPS,
+    match_aspect=True,
+    )
+
+glyph1 = Patches(xs="xs", ys="ys", fill_color="#000000", line_color="#ff0000")
+plot.add_glyph(source_boundary, glyph1)
+
+glyph2 = Patches(xs="xs", ys="ys", fill_color="color", line_color = "color", fill_alpha = 0.7)
+plot.add_glyph(source, glyph2)
+
+plot.circle(x=possible_locations.centroid.x,
+            y=possible_locations.centroid.y,
+            fill_color="white", size=8)
+
+plot.xaxis.formatter = NumeralTickFormatter(format='0')
+plot.yaxis.formatter = NumeralTickFormatter(format='0')
+
+show(plot)
+
+print(possible_locations.centroid.x*4000000+possible_locations.centroid.y)
