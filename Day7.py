@@ -172,33 +172,84 @@ print(sum_sizes(filesystem,total_size=0))
 
 limit = 100000
 
-keys=[]
-values=[]
+# keys=[]
+# values=[]
 def small_dirs(dic,total_size):
     
     for key in dic:
         if isinstance(dic[key], dict):
-            print(key)
-            print(dic[key])
-            print(sum_sizes(dic[key],total_size=0))
+            # print(key)
+            # print(dic[key])
+            # print(sum_sizes(dic[key],total_size=0))
             if sum_sizes(dic[key],total_size=0)<=limit:
-                print("key added: "+key)
-                keys.append(key)
-                values.append(sum_sizes(dic[key],total_size=0))
-                total_size = total_size+sum_sizes(dic[key],total_size=0)+small_dirs(dic[key],total_size)
+                # print("key added: "+key)
+                # keys.append(key)
+                # values.append(sum_sizes(dic[key],total_size=0))
+                total_size = total_size+sum_sizes(dic[key],total_size=0)
+                total_size = small_dirs(dic[key],total_size)
             else:
                 total_size = small_dirs(dic[key],total_size)
-        else:
-            total_size = total_size
 
     return total_size
 
 print(small_dirs(filesystem,total_size=0))
-print(keys)
-print(values)
+# print(keys)
+# print(values)
 
-total=0
-for value in values:
-    total=total+value
+# total=0
+# for value in values:
+#     total=total+value
 
-print(total)    
+# print(total)    
+
+
+
+"""
+Your puzzle answer was 1297159.
+
+The first half of this puzzle is complete! It provides one gold star: *
+--- Part Two ---
+
+Now, you're ready to choose a directory to delete.
+
+The total disk space available to the filesystem is 70000000. To run the update, you need unused space of at least 30000000. You need to find a directory you can delete that will free up enough space to run the update.
+
+In the example above, the total size of the outermost directory (and thus the total amount of used space) is 48381165; this means that the size of the unused space must currently be 21618835, which isn't quite the 30000000 required by the update. Therefore, the update still requires a directory with total size of at least 8381165 to be deleted before it can run.
+
+To achieve this, you have the following options:
+
+    Delete directory e, which would increase unused space by 584.
+    Delete directory a, which would increase unused space by 94853.
+    Delete directory d, which would increase unused space by 24933642.
+    Delete directory /, which would increase unused space by 48381165.
+
+Directories e and a are both too small; deleting them would not free up enough space. However, directories d and / are both big enough! Between these, choose the smallest: d, increasing unused space by 24933642.
+
+Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. What is the total size of that directory?
+
+"""
+
+file_space=70000000-sum_sizes(filesystem,total_size=0)
+space_required=30000000-file_space
+
+print(space_required)
+
+def smallest_dir(dic,total_size):
+    
+    for key in dic:
+        if isinstance(dic[key], dict):
+            # print(key)
+            # print(dic[key])
+            # print(sum_sizes(dic[key],total_size=0))
+            if (sum_sizes(dic[key],total_size=0)>=space_required) and (sum_sizes(dic[key],total_size=0)<=total_size):
+                print("key added: "+key)
+                # keys.append(key)
+                # values.append(sum_sizes(dic[key],total_size=0))
+                total_size = sum_sizes(dic[key],total_size=0)
+                total_size = smallest_dir(dic[key],total_size)
+            else:
+                total_size = smallest_dir(dic[key],total_size)
+
+    return total_size
+
+print(smallest_dir(filesystem,total_size=70000000))
