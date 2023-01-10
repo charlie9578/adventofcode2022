@@ -81,25 +81,9 @@ To begin, find all of the directories with a total size of at most 100000, then 
 Find all of the directories with a total size of at most 100000. What is the sum of the total sizes of those directories?
 """
 
-from typing import NamedTuple
-
-class directory(NamedTuple):
-    # name:str
-    # directories:list
-    # files:list
-    pass
-
-class file(NamedTuple):
-    name:str
-    size:int
-    
+from typing import NamedTuple   
 
 filesystem = dict()
-
-print(filesystem)
-call = ["root","a"]
-filesystem["root"] = {}
-filesystem["root"]["c"] = {"size":99}
 
 def nested_get(dic, keys):    
     for key in keys:
