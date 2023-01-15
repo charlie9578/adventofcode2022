@@ -33,7 +33,6 @@ Consider your map; how many trees are visible from outside the grid?
 """
 
 import numpy as np
-import pandas as pd
 
 data = []
 with open(r"day/8/input", "r") as file:
