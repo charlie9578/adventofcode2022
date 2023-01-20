@@ -207,9 +207,9 @@ def falling_sand(cave,min_y,min_x):
   while more_sand==True:
 
     cnt_sand=cnt_sand+1
-    if cnt_sand%100:
+    if cnt_sand%100==0:
       print(cnt_sand)
-      
+
     falling=True
 
     if cave[0-min_y,500-min_x]==8:
