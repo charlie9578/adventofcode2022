@@ -72,49 +72,81 @@ In the larger example above, exactly one cube of air is trapped within the lava 
 What is the exterior surface area of your scanned lava droplet?
 """
 
+# create an empty 3D array
 xs=[]
 ys=[]
 zs=[]
-for x in range(df["x"].min()+1,df["x"].max()):
-    for y in range(df["y"].min()+1,df["y"].max()):
-        for z in range(df["z"].min()+1,df["z"].max()):
+for x in range(df["x"].min(),df["x"].max()+1):
+    for y in range(df["y"].min(),df["y"].max()+1):
+        for z in range(df["z"].min(),df["z"].max()+1):
             xs.append(x)
             ys.append(y)
             zs.append(z)
 df_empty=pd.DataFrame(zip(xs,ys,zs),columns=["x","y","z"])
 
 print(df_empty)
+print(df)
 
-neighbours=[]
-for cnt,pixel in df_empty.iterrows():
-    # print(pixel)
-    # print((df[["x","y"]]==pixel[["x","y"]]).sum(axis=1))
-    df_delta = df-pixel
-    neighbours.append((sum(df_delta.abs().sum(axis=1)==1)))
+# remove the locations where there are cubes
+df_empty = pd.concat([df_empty,df[["x","y","z"]]])
 
-df_empty['neighbours']=neighbours
-df_empty['exposed_sides']=6-df_empty['neighbours']
+df_empty = df_empty.drop_duplicates(keep=False)
+
+df_empty["outer"]=0
 
 print(df_empty)
 
-internals=df_empty[df_empty['exposed_sides']==0]
+# identify all the locations with access to the outside
+df_empty.loc[df_empty["x"]==df_empty["x"].min(),"outer"]=1
+df_empty.loc[df_empty["y"]==df_empty["y"].min(),"outer"]=1
+df_empty.loc[df_empty["z"]==df_empty["z"].min(),"outer"]=1
+df_empty.loc[df_empty["x"]==df_empty["x"].max(),"outer"]=1
+df_empty.loc[df_empty["y"]==df_empty["y"].max(),"outer"]=1
+df_empty.loc[df_empty["z"]==df_empty["z"].max(),"outer"]=1
 
-print(internals)
+print(df_empty)
 
-df_new = pd.concat([df,internals],axis=0).drop_duplicates().reset_index(drop=True).drop(columns=["neighbours","exposed_sides"])
+print("Filler")
+cnt_outers = df_empty[df_empty["outer"]>0]["outer"].count()
+cnt_outers_old = cnt_outers
+keep_filling = True
+while keep_filling:
+    outers = []
+    for cnt,pixel in df_empty[df_empty["outer"]==0].iterrows():
+        df_delta = df_empty.loc[df_empty["outer"]>0,["x","y","z"]]-pixel[["x","y","z"]]
+        neighbours = sum(df_delta.abs().sum(axis=1)==1)
+        outers.append(neighbours)
+    
+    df_empty.loc[df_empty["outer"]==0,"outer"]=outers
+    print(outers)
+    print(cnt_outers)
+    cnt_outers_old = cnt_outers
+    cnt_outers = df_empty[df_empty["outer"]>0]["outer"].count()
+    print(cnt_outers)
 
-print(df_new)
+    if cnt_outers==cnt_outers_old:
+        keep_filling=False
 
+
+# the inner cubes are those that do not have access to the outside
+df_inners = df_empty[df_empty["outer"]==0]
+
+
+df = pd.read_csv(file_name,names=["x","y","z"])
+
+# add the inners to the original cubes so that its one solid block
+df_filled = pd.concat([df,df_inners[["x","y","z"]]])
+print(df_filled)
+
+# re-calculate the exposed sides
 neighbours=[]
-for cnt,pixel in df_new.iterrows():
-    # print(pixel)
-    # print((df[["x","y"]]==pixel[["x","y"]]).sum(axis=1))
-    df_delta = df_new-pixel
+for cnt,pixel in df_filled.iterrows():
+    df_delta = df_filled-pixel
     neighbours.append((sum(df_delta.abs().sum(axis=1)==1)))
 
-df_new['neighbours']=neighbours
-df_new['exposed_sides']=6-df_new['neighbours']
+df_filled['neighbours']=neighbours
+df_filled['exposed_sides']=6-df_filled['neighbours']
 
-print(df_new)
-print(df_new.sum())
+print(df_filled)
 
+print(df_filled.sum())
