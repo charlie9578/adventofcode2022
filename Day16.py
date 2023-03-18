@@ -170,7 +170,7 @@ print(flow)
 print(target)
 
 df = pd.DataFrame(list(zip(valve,target,flow)),
-               columns =['Source', 'Target','Flow'])
+               columns =['Source','Target','Flow'])
 
 print(df)
 
