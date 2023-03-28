@@ -412,28 +412,6 @@ rock_cnt = 1
 descend = 0
 while rock_cnt < 2023:
     
-    # plot the shapes
-    if rock_cnt>9999:
-        shapes_placed = dead_shapes + [active_shape]
-
-        xs = []
-        ys = []
-        for shape in shapes_placed:
-            xs = xs + [np.array(shape.boundary.coords.xy[1])]
-            ys = ys + [np.array(shape.boundary.coords.xy[0])]
-
-        source = ColumnDataSource(dict(xs = xs, ys = ys))
-
-        p = figure(title = "rocks: "+str(rock_cnt)+"height: "+str(start_height-start_height_delta), tools = 'pan, wheel_zoom, box_zoom, reset, hover, save',
-            width = int(700/4),
-            height = int(6000/4),
-            x_range = (0,7),
-            y_range = (0,60),
-            aspect_scale=1)
-
-        p.patches(xs='ys', ys='xs', fill_alpha = 0.7, fill_color = 'green', line_color = 'black', line_width = 0.5, source = source)
-        show(p)
-
     # determine jet movement
     jet = jets[descend%len(jets)]
 
@@ -460,28 +438,6 @@ while rock_cnt < 2023:
     if len(dead_shapes) > 0:
         if active_shape.intersection(dead_shape).area>0:
             active_shape = shapely.affinity.translate(active_shape, xoff=-xoff, yoff=0)
-
-    # plot the shapes
-    if rock_cnt>9999:
-        shapes_placed = dead_shapes + [active_shape]
-
-        xs = []
-        ys = []
-        for shape in shapes_placed:
-            xs = xs + [np.array(shape.boundary.coords.xy[1])]
-            ys = ys + [np.array(shape.boundary.coords.xy[0])]
-
-        source = ColumnDataSource(dict(xs = xs, ys = ys))
-
-        p = figure(title = "rocks: "+str(rock_cnt)+"height: "+str(start_height-start_height_delta), tools = 'pan, wheel_zoom, box_zoom, reset, hover, save',
-            width = int(700/4),
-            height = int(6000/4),
-            x_range = (0,7),
-            y_range = (0,60),
-            aspect_scale=1)
-
-        p.patches(xs='ys', ys='xs', fill_alpha = 0.7, fill_color = 'green', line_color = 'black', line_width = 0.5, source = source)
-        show(p)
 
     # fall movement
     active_shape = shapely.affinity.translate(active_shape, xoff=0, yoff=-1)
