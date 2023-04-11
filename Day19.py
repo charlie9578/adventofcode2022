@@ -170,8 +170,6 @@ Determine the quality level of each blueprint by multiplying that blueprint's ID
 Determine the quality level of each blueprint using the largest number of geodes it could produce in 24 minutes. What do you get if you add up the quality level of all of the blueprints in your list?
 """
 
-import re
-import itertools
 import time
 
 # Read in the blueprints
@@ -209,430 +207,6 @@ with open(file_name, "r") as file:
 
 print(blueprints)
 
-# minutes = 24
-# blueprint = blueprints[0]
-# targets = [0,1]+[1,1,2,1,2,3,3]
-# robots = [1,0,0,0]
-# minerals = [0,0,0,0]
-# most_geodes = 0
-# for minute in range(minutes):
-
-#     print(f"\n== Minute {minute+1} ==")
-#     print(f"Robots: {robots}")
-
-#     # build robots with available resources
-#     if sum(robots) < len(targets):
-#         target_robot = targets[sum(robots)]
-#         robot_cost = blueprint[target_robot]
-
-#         if minerals[0]>=robot_cost[0] and minerals[1]>=robot_cost[1] and minerals[2]>=robot_cost[2]:
-#             robots[target_robot] = robots[target_robot] + 1
-#             for cnt,mineral in enumerate(robot_cost):
-#                 minerals[cnt]=minerals[cnt]-mineral
-#             minerals[target_robot] = minerals[target_robot] - 1
-#             print(f"Robot {target_robot} built")
-
-#     # mine minerals
-#     for cnt,robot in enumerate(robots):
-#         minerals[cnt]=minerals[cnt]+robot
-
-#     print(f"Minerals: {minerals}")
-
-# total_geodes = minerals[3]
-
-# print(f"\nTotal geodes: {minerals[3]}\n")
-
-# if minerals[3]>=most_geodes:
-#     most_geodes = minerals[3]
-
-
-# def calculate_geodes(targets,blueprint):
-    
-#     targets = targets.copy()
-#     minutes = 24
-#     robots = [1,0,0,0]
-#     minerals = [0,0,0,0]
-#     previous_minerals = [0,0,0,0]
-#     wait = 0
-#     shortages = [0,0,0]
-
-#     for minute in range(minutes):
-
-#         # print(f"\n== Minute {minute+1} ==")
-#         # print(f"Robots: {robots}")
-
-#         # build robots with available resources
-#         if sum(robots) < len(targets):
-#             target_robot = targets[sum(robots)]
-#             robot_cost = blueprint[target_robot]
-
-#             if minerals[0]>=robot_cost[0] and minerals[1]>=robot_cost[1] and minerals[2]>=robot_cost[2]:
-#                 robots[target_robot] = robots[target_robot] + 1
-#                 for cnt,mineral in enumerate(robot_cost):
-#                     minerals[cnt]=minerals[cnt]-mineral
-#                 minerals[target_robot] = minerals[target_robot] - 1
-#                 # print(f"Robot {target_robot} built")
-
-#                 for cnt in range(3):
-#                     if previous_minerals[cnt]<robot_cost[cnt]:
-#                         # print(f"Minute {minute}. Robot built {target_robot}. More {cnt} would speed things up. {wait} minute wait")
-#                         shortages[cnt] = shortages[cnt] + wait
-#                         wait = 0
-
-#             wait = wait + 1
-#             previous_minerals = minerals.copy()
-                
-
-#         # mine minerals
-#         for cnt,robot in enumerate(robots):
-#             minerals[cnt]=minerals[cnt]+robot
-
-#         # print(f"Minerals: {minerals}")
-
-#     total_geodes = minerals[3]
-
-#     # print(f"\nTotal geodes: {total_geodes}\n")   
-
-#     suggested_build = shortages.index(max(shortages))
-#     # print(f"Shortages: {shortages}")
-#     # print(f"Suggested build: {suggested_build}")
-
-#     return total_geodes,robots,suggested_build
-
-
-
-# blueprint = blueprints[1]
-# targets = [0,1]+[1,1,2,1,2,3,3]
-# targets = [0,1,1,1,1,2,2,3,3,3,3,3,3,3]
-# targets = [0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,3,3]
-
-# targets = [0,1,2,3,3,3,3,3,3,3,3,3,3,3]
-# max_geodes = 0
-# best_targets = []
-# for a in range(20):
-
-#     for b in range(20):
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-#         print(total_geodes)
-
-#         if total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-        
-#         targets.insert(targets.index(suggested_build),suggested_build)
-
-#     if total_geodes>= max_geodes:
-#         max_geodes = total_geodes
-#         best_targets = targets.copy()
-       
-#     targets = best_targets.copy()
-#     suggested_build = 0
-#     targets.insert(targets.index(suggested_build),suggested_build)
-#     total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#     if total_geodes>= max_geodes:
-#         max_geodes = total_geodes
-#         best_targets = targets.copy()
-
-#     targets = best_targets.copy()
-#     suggested_build = 1
-#     targets.insert(targets.index(suggested_build),suggested_build)
-#     total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#     if total_geodes>= max_geodes:
-#         max_geodes = total_geodes
-#         best_targets = targets.copy()
-
-#     targets = best_targets.copy()
-#     suggested_build = 2
-#     targets.insert(targets.index(suggested_build),suggested_build)
-#     total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#     if total_geodes>= max_geodes:
-#         max_geodes = total_geodes
-#         best_targets = targets.copy()
-
-#     targets = best_targets.copy()
-#     shift_value = 1
-#     shift_index = targets.index(shift_value)
-#     shifted_value = targets[shift_index-1]
-#     targets[shift_index-1] = shift_value
-#     targets[shift_index] = shifted_value
-#     total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#     if total_geodes>= max_geodes:
-#         max_geodes = total_geodes
-#         best_targets = targets.copy()
-
-#     targets = best_targets.copy()
-#     shift_value = 2
-#     shift_index = targets.index(shift_value)
-#     shifted_value = targets[shift_index-1]
-#     targets[shift_index-1] = shift_value
-#     targets[shift_index] = shifted_value
-#     total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#     if total_geodes>= max_geodes:
-#         max_geodes = total_geodes
-#         best_targets = targets.copy()
-
-#     targets = best_targets.copy()
-#     shift_value = 3
-#     shift_index = targets.index(shift_value)
-#     shifted_value = targets[shift_index-1]
-#     targets[shift_index-1] = shift_value
-#     targets[shift_index] = shifted_value
-#     total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#     print(f"Best result: {max_geodes},{best_targets}")
-
-# print(f"Best result: {max_geodes},{best_targets}")
-
-
-# target_list = []
-# for a in range(1,5):
-#     for b in range(1,11):
-#         for c in range(1,11):
-#             d = 8
-
-#             # no switching
-#             target_list.append([0]*a+[1]*b+[2]*c+[3]*d)
-
-#             # one switch
-#             target_list.append([0]*(a-1)+[1]+[0]+[1]*(b-1)+[2]*c+[3]*d)
-#             target_list.append([0]*a+[1]*(b-1)+[2]+[1]+[2]*(c-1)+[3]*d)
-#             target_list.append([0]*a+[1]*b+[2]*(c-1)+[3]+[2]+[3]*(d-1))
-                
-#             # one switch 2 places
-#             if a>1:
-#                 target_list.append([0]*(a-2)+[1]+2*[0]+[1]*(b-1)+[2]*c+[3]*d)
-#             if b>1:
-#                 target_list.append([0]*a+[1]*(b-2)+[2]+2*[1]+[2]*(c-1)+[3]*d)
-#             if c>1:
-#                 target_list.append([0]*a+[1]*b+[2]*(c-2)+[3]+2*[2]+[3]*(d-1))
-
-#             # one switch 3 places
-#             if a>2:
-#                 target_list.append([0]*(a-3)+[1]+3*[0]+[1]*(b-1)+[2]*c+[3]*d)
-#             if b>2:
-#                 target_list.append([0]*a+[1]*(b-3)+[2]+3*[1]+[2]*(c-1)+[3]*d)
-#             if c>2:
-#                 target_list.append([0]*a+[1]*b+[2]*(c-3)+[3]+3*[2]+[3]*(d-1))
-
-#             # two different switches
-#             # 1 & 2
-#             if b>1:
-#                 target_list.append([0]*(a-1)+[1]+[0]+[1]*(b-2)+[2]+[1]+[2]*(c-1)+[3]*d)
-#             # 2 & 3
-#             if c>1:
-#                 target_list.append([0]*a+[1]*(b-1)+[2]+[1]+[2]*(c-2)+[3]+[2]+[3]*d)
-#             # 1 & 3
-#             target_list.append([0]*(a-1)+[1]+[0]+[1]*(b-1)+[2]*(c-1)+[3]+[2]+[3]*(d-1))
-
-#             # two different switches both two places
-#             # 1 & 2
-#             if a>1 and b>2:
-#                 target_list.append([0]*(a-2)+[1]+2*[0]+[1]*(b-3)+[2]+2*[1]+[2]*(c-1)+[3]*d)
-#             # 2 & 3
-#             if b>1 and c>2:
-#                 target_list.append([0]*a+[1]*(b-2)+[2]+2*[1]+[2]*(c-3)+[3]+2*[2]+[3]*d)
-#             # 1 & 3
-#             if a>1 and c>1:
-#                 target_list.append([0]*(a-2)+[1]+2*[0]+[1]*(b-1)+[2]*(c-2)+[3]+2*[2]+[3]*(d-1))
-
-#             # three different switches
-#             if b>1 and c>1:
-#                 target_list.append([0]*(a-1)+[1]+[0]+[1]*(b-2)+[2]+[1]+[2]*(c-2)+[3]+[2]+[3]*(d-1))
-
-
-# print(len(target_list))
-
-# ids = []
-# blueprint_cnt = 0
-
-# for blueprint in blueprints:
-#     blueprint_cnt = blueprint_cnt+1
-
-#     max_geodes = 0
-#     for targets in target_list:
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#         if total_geodes>0 and total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-
-#     print(f"Best result from target_list for blueprint {blueprint_cnt}. Geodes: {max_geodes}, Robots produced: {best_targets}, ID: {max_geodes*blueprint_cnt}")
-
-#     ids.append(max_geodes*blueprint_cnt)
-
-# print(f"Total ids: {sum(ids)}")
-
-
-
-# def dodgy_optimizer(blueprint):
-#     targets = [0,1,2,3,3,3,3,3,3,3,3,3,3,3]
-#     max_geodes = 0
-#     best_targets = targets.copy()
-#     for a in range(20):
-
-#         for b in range(20):
-#             total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-#             # print(total_geodes)
-
-#             if total_geodes>0 and total_geodes>= max_geodes:
-#                 max_geodes = total_geodes
-#                 best_targets = targets.copy()
-            
-#             targets.insert(targets.index(suggested_build),suggested_build)
-
-#         if total_geodes>0 and total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-        
-#         targets = best_targets.copy()
-#         suggested_build = 0
-#         targets.insert(targets.index(suggested_build),suggested_build)
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#         if total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-
-#         targets = best_targets.copy()
-#         suggested_build = 1
-#         targets.insert(targets.index(suggested_build),suggested_build)
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#         if total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-
-#         targets = best_targets.copy()
-#         suggested_build = 2
-#         targets.insert(targets.index(suggested_build),suggested_build)
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#         if total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-
-#         targets = best_targets.copy()
-#         shift_value = 1
-#         shift_index = targets.index(shift_value)
-#         shifted_value = targets[shift_index-1]
-#         targets[shift_index-1] = shift_value
-#         targets[shift_index] = shifted_value
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#         if total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-
-#         targets = best_targets.copy()
-#         shift_value = 2
-#         shift_index = targets.index(shift_value)
-#         shifted_value = targets[shift_index-1]
-#         targets[shift_index-1] = shift_value
-#         targets[shift_index] = shifted_value
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#         if total_geodes>= max_geodes:
-#             max_geodes = total_geodes
-#             best_targets = targets.copy()
-
-#         targets = best_targets.copy()
-#         shift_value = 3
-#         shift_index = targets.index(shift_value)
-#         shifted_value = targets[shift_index-1]
-#         targets[shift_index-1] = shift_value
-#         targets[shift_index] = shifted_value
-#         total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-
-#         # print(f"Best result: {max_geodes},{best_targets}")
-
-#     # print(f"Best result: {max_geodes},{best_targets}")
-
-#     return (max_geodes,best_targets,robots)
-
-# blueprint_cnt = 0
-# final_geodes = 0
-# best_result = []
-# ids = []
-# for blueprint in blueprints:
-#     blueprint_cnt = blueprint_cnt+1
-#     max_geodes,best_targets,robots = dodgy_optimizer(blueprint)
-#     print(f"Best result from optimizer for blueprint {blueprint_cnt}. Geodes: {max_geodes}, Robots produced: {robots}, ID: {max_geodes*blueprint_cnt}")
-#     ids.append(max_geodes*blueprint_cnt)
-
-# print(f"Total ids: {sum(ids)}")
-
-# shift_value = 0
-# targets = best_targets.copy()
-# for a in range(15):
-
-#     total_geodes,robots,suggested_build = calculate_geodes(targets,blueprint)
-#     print(total_geodes)
-
-#     if total_geodes>= max_geodes:
-#         max_geodes = total_geodes
-#         best_targets = targets.copy()
-
-#     shift_value = (shift_value + 1)%3
-#     targets = best_targets.copy()
-#     shift_index = targets.index(shift_value)
-#     shifted_value = targets[shift_index-1]
-#     print(targets)
-#     targets[shift_index-1] = shift_value
-#     targets[shift_index] = shifted_value
-#     print(targets)
-
-# print(f"Shifting nodes best result: {max_geodes},{best_targets}")
-
-# blueprint = blueprints[1]
-
-# combos = itertools.product(range(12),repeat=10)
-# print(len(list(combos)))
-
-# combos = [[1,1,2,1,2,3,3]] # solution to blueprint 0
-# robots_used = []
-# old_targets = []
-# most_geodes = 0
-# for combo in combos:
-    
-#     combo = list(combo)
-
-#     combo_clean = []
-#     for cnt,item in enumerate(combo):
-#         combo_clean.append(item%4)
-#         run = True
-#         if cnt>0 and (item%4)>max(combo_clean[0:cnt])+1:
-#             run = False
-#             break
-
-#     if combo_clean[0]>2: 
-#         run = False
-
-#     if 3 not in combo_clean:
-#         run = False
-
-#     targets = [0,1]+list(combo_clean)  
-
-#     if robots_used:
-#         if targets[0:sum(robots_used)] == old_targets[0:sum(robots_used)]:
-#             run = False
-
-#     if run:
-#             geodes,robots_used = calculate_geodes(targets,blueprint)
-
-#             print(f"Targets: {targets}, Old targets: {old_targets}, Robots: {robots_used}, Geodes: {geodes}")
-
-#             if geodes>=most_geodes:
-#                 most_geodes = geodes
-#                 print(most_geodes)
-
-#             old_targets=targets.copy()
-
-# print(most_geodes)
 
 
 def calculate_geodes_recursive(minerals,robots,blueprint,step,max_geodes,target_robots):
@@ -693,11 +267,7 @@ def calculate_geodes_recursive(minerals,robots,blueprint,step,max_geodes,target_
 
                 # try to build the same robot next time round if failed to build it
                 step,minerals,robots,max_geodes = calculate_geodes_recursive(minerals_old.copy(),robots_old.copy(),blueprint,step_old,max_geodes,target_robots=[target_robot])
-        
-        # print(step,minerals,robots)
-
-    # print(step,minerals,robots)
-    
+            
     if minerals[3]>max_geodes:
         max_geodes = minerals[3]
 
@@ -709,12 +279,12 @@ def calculate_geodes_recursive(minerals,robots,blueprint,step,max_geodes,target_
     
         
 
-print(f"\n==== RECURSIVE ====\n")
+print(f"\n==== PART 1 ====\n")
 blueprint = blueprints[0]
-minerals=[0,0,0,0] #[4,15,0,0] #[4, 25, 7, 2] # [0,0,0,0]
-robots=[1,0,0,0] # [1, 3, 0, 0] # [1,0,0,0]
+minerals=[0,0,0,0]
+robots=[1,0,0,0]
 target_robots=[0,1,2,3]
-step=0 #10 #20
+step=0
 
 start_time = time.time()
 print(time.strftime("%H:%M:%S", time.localtime(start_time)))
@@ -739,43 +309,315 @@ for blueprint in blueprints:
 
 print(f"Total ids: {sum(ids)}")
 
-# def simple_recursion(step,target_robot,minerals):
-#     step = step+1
+
+"""
+Your puzzle answer was 1550.
+
+The first half of this puzzle is complete! It provides one gold star: *
+--- Part Two ---
+
+While you were choosing the best blueprint, the elephants found some food on their own, so you're not in as much of a hurry; you figure you probably have 32 minutes before the wind changes direction again and you'll need to get out of range of the erupting volcano.
+
+Unfortunately, one of the elephants ate most of your blueprint list! Now, only the first three blueprints in your list are intact.
+
+In 32 minutes, the largest number of geodes blueprint 1 (from the example above) can open is 56. One way to achieve that is:
+
+== Minute 1 ==
+1 ore-collecting robot collects 1 ore; you now have 1 ore.
+
+== Minute 2 ==
+1 ore-collecting robot collects 1 ore; you now have 2 ore.
+
+== Minute 3 ==
+1 ore-collecting robot collects 1 ore; you now have 3 ore.
+
+== Minute 4 ==
+1 ore-collecting robot collects 1 ore; you now have 4 ore.
+
+== Minute 5 ==
+Spend 4 ore to start building an ore-collecting robot.
+1 ore-collecting robot collects 1 ore; you now have 1 ore.
+The new ore-collecting robot is ready; you now have 2 of them.
+
+== Minute 6 ==
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+
+== Minute 7 ==
+Spend 2 ore to start building a clay-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+The new clay-collecting robot is ready; you now have 1 of them.
+
+== Minute 8 ==
+Spend 2 ore to start building a clay-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+1 clay-collecting robot collects 1 clay; you now have 1 clay.
+The new clay-collecting robot is ready; you now have 2 of them.
+
+== Minute 9 ==
+Spend 2 ore to start building a clay-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+2 clay-collecting robots collect 2 clay; you now have 3 clay.
+The new clay-collecting robot is ready; you now have 3 of them.
+
+== Minute 10 ==
+Spend 2 ore to start building a clay-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+3 clay-collecting robots collect 3 clay; you now have 6 clay.
+The new clay-collecting robot is ready; you now have 4 of them.
+
+== Minute 11 ==
+Spend 2 ore to start building a clay-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+4 clay-collecting robots collect 4 clay; you now have 10 clay.
+The new clay-collecting robot is ready; you now have 5 of them.
+
+== Minute 12 ==
+Spend 2 ore to start building a clay-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+5 clay-collecting robots collect 5 clay; you now have 15 clay.
+The new clay-collecting robot is ready; you now have 6 of them.
+
+== Minute 13 ==
+Spend 2 ore to start building a clay-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+6 clay-collecting robots collect 6 clay; you now have 21 clay.
+The new clay-collecting robot is ready; you now have 7 of them.
+
+== Minute 14 ==
+Spend 3 ore and 14 clay to start building an obsidian-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 2 ore.
+7 clay-collecting robots collect 7 clay; you now have 14 clay.
+The new obsidian-collecting robot is ready; you now have 1 of them.
+
+== Minute 15 ==
+2 ore-collecting robots collect 2 ore; you now have 4 ore.
+7 clay-collecting robots collect 7 clay; you now have 21 clay.
+1 obsidian-collecting robot collects 1 obsidian; you now have 1 obsidian.
+
+== Minute 16 ==
+Spend 3 ore and 14 clay to start building an obsidian-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+7 clay-collecting robots collect 7 clay; you now have 14 clay.
+1 obsidian-collecting robot collects 1 obsidian; you now have 2 obsidian.
+The new obsidian-collecting robot is ready; you now have 2 of them.
+
+== Minute 17 ==
+Spend 3 ore and 14 clay to start building an obsidian-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 2 ore.
+7 clay-collecting robots collect 7 clay; you now have 7 clay.
+2 obsidian-collecting robots collect 2 obsidian; you now have 4 obsidian.
+The new obsidian-collecting robot is ready; you now have 3 of them.
+
+== Minute 18 ==
+2 ore-collecting robots collect 2 ore; you now have 4 ore.
+7 clay-collecting robots collect 7 clay; you now have 14 clay.
+3 obsidian-collecting robots collect 3 obsidian; you now have 7 obsidian.
+
+== Minute 19 ==
+Spend 3 ore and 14 clay to start building an obsidian-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+7 clay-collecting robots collect 7 clay; you now have 7 clay.
+3 obsidian-collecting robots collect 3 obsidian; you now have 10 obsidian.
+The new obsidian-collecting robot is ready; you now have 4 of them.
+
+== Minute 20 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 3 ore.
+7 clay-collecting robots collect 7 clay; you now have 14 clay.
+4 obsidian-collecting robots collect 4 obsidian; you now have 7 obsidian.
+The new geode-cracking robot is ready; you now have 1 of them.
+
+== Minute 21 ==
+Spend 3 ore and 14 clay to start building an obsidian-collecting robot.
+2 ore-collecting robots collect 2 ore; you now have 2 ore.
+7 clay-collecting robots collect 7 clay; you now have 7 clay.
+4 obsidian-collecting robots collect 4 obsidian; you now have 11 obsidian.
+1 geode-cracking robot cracks 1 geode; you now have 1 open geode.
+The new obsidian-collecting robot is ready; you now have 5 of them.
+
+== Minute 22 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 2 ore.
+7 clay-collecting robots collect 7 clay; you now have 14 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 9 obsidian.
+1 geode-cracking robot cracks 1 geode; you now have 2 open geodes.
+The new geode-cracking robot is ready; you now have 2 of them.
+
+== Minute 23 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 2 ore.
+7 clay-collecting robots collect 7 clay; you now have 21 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 7 obsidian.
+2 geode-cracking robots crack 2 geodes; you now have 4 open geodes.
+The new geode-cracking robot is ready; you now have 3 of them.
+
+== Minute 24 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 2 ore.
+7 clay-collecting robots collect 7 clay; you now have 28 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 5 obsidian.
+3 geode-cracking robots crack 3 geodes; you now have 7 open geodes.
+The new geode-cracking robot is ready; you now have 4 of them.
+
+== Minute 25 ==
+2 ore-collecting robots collect 2 ore; you now have 4 ore.
+7 clay-collecting robots collect 7 clay; you now have 35 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 10 obsidian.
+4 geode-cracking robots crack 4 geodes; you now have 11 open geodes.
+
+== Minute 26 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 4 ore.
+7 clay-collecting robots collect 7 clay; you now have 42 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 8 obsidian.
+4 geode-cracking robots crack 4 geodes; you now have 15 open geodes.
+The new geode-cracking robot is ready; you now have 5 of them.
+
+== Minute 27 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 4 ore.
+7 clay-collecting robots collect 7 clay; you now have 49 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 6 obsidian.
+5 geode-cracking robots crack 5 geodes; you now have 20 open geodes.
+The new geode-cracking robot is ready; you now have 6 of them.
+
+== Minute 28 ==
+2 ore-collecting robots collect 2 ore; you now have 6 ore.
+7 clay-collecting robots collect 7 clay; you now have 56 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 11 obsidian.
+6 geode-cracking robots crack 6 geodes; you now have 26 open geodes.
+
+== Minute 29 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 6 ore.
+7 clay-collecting robots collect 7 clay; you now have 63 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 9 obsidian.
+6 geode-cracking robots crack 6 geodes; you now have 32 open geodes.
+The new geode-cracking robot is ready; you now have 7 of them.
+
+== Minute 30 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 6 ore.
+7 clay-collecting robots collect 7 clay; you now have 70 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 7 obsidian.
+7 geode-cracking robots crack 7 geodes; you now have 39 open geodes.
+The new geode-cracking robot is ready; you now have 8 of them.
+
+== Minute 31 ==
+Spend 2 ore and 7 obsidian to start building a geode-cracking robot.
+2 ore-collecting robots collect 2 ore; you now have 6 ore.
+7 clay-collecting robots collect 7 clay; you now have 77 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 5 obsidian.
+8 geode-cracking robots crack 8 geodes; you now have 47 open geodes.
+The new geode-cracking robot is ready; you now have 9 of them.
+
+== Minute 32 ==
+2 ore-collecting robots collect 2 ore; you now have 8 ore.
+7 clay-collecting robots collect 7 clay; you now have 84 clay.
+5 obsidian-collecting robots collect 5 obsidian; you now have 10 obsidian.
+9 geode-cracking robots crack 9 geodes; you now have 56 open geodes.
+
+However, blueprint 2 from the example above is still better; using it, the largest number of geodes you could open in 32 minutes is 62.
+
+You no longer have enough blueprints to worry about quality levels. Instead, for each of the first three blueprints, determine the largest number of geodes you could open; then, multiply these three values together.
+
+Don't worry about quality levels; instead, just determine the largest number of geodes you could open using each of the first three blueprints. What do you get if you multiply these numbers together?
+
+"""
+
+def calculate_geodes_recursive32(minerals,robots,blueprint,step,max_geodes,target_robots):
+    minerals=minerals.copy()
+    robots=robots.copy()
+    step = int(step)
+
+    step = step + 1
+
+    if step<=32:        
+
+        # try and create robots
+        step_pre_loop = step
+        minerals_pre_loop = minerals.copy()
+        robots_pre_loop = robots.copy()
+
+        for target_robot in target_robots:
+            
+            step_old = step_pre_loop
+            minerals_old = minerals_pre_loop.copy()
+            robots_old = robots_pre_loop.copy()
+
+            robot_cost = blueprint[target_robot]
+            
+            # create the target robot if possible
+            if minerals_old[0]>=robot_cost[0] and minerals_old[1]>=robot_cost[1] and minerals_old[2]>=robot_cost[2]:
+                robots_old[target_robot] = robots_old[target_robot] + 1
+                for cnt,mineral in enumerate(robot_cost):
+                    minerals_old[cnt]=minerals_old[cnt]-mineral
+                minerals_old[target_robot] = minerals_old[target_robot] - 1
+
+                # mine minerals
+                for cnt,robot in enumerate(robots_old):
+                    minerals_old[cnt]=minerals_old[cnt]+robot
+
+
+                # continue to next round
+                new_target_robots = []
+                if robots_old[0]<max(blueprint[0][0],blueprint[1][0],blueprint[2][0],blueprint[3][0]):
+                    new_target_robots.append(0)
+                if robots_old[1]<max(blueprint[0][1],blueprint[1][1],blueprint[2][1],blueprint[3][1]):
+                    new_target_robots.append(1)
+                if robots_old[2]<max(blueprint[0][2],blueprint[1][2],blueprint[2][2],blueprint[3][2]) and robots_old[1]>=1:
+                    new_target_robots.append(2)
+                if robots_old[2]>=1:
+                    new_target_robots.append(3)
+
+                if (minerals[3]+(33-step_old)*robots[3]+(33-step_old)*(33-step_old))<max_geodes:
+                    step = 99
+                    return step,minerals,robots,max_geodes
+
+                step,minerals,robots,max_geodes = calculate_geodes_recursive32(minerals_old.copy(),robots_old.copy(),blueprint,step_old,max_geodes,target_robots=new_target_robots)
+
+            else:
+                # mine minerals
+                for cnt,robot in enumerate(robots_old):
+                    minerals_old[cnt]=minerals_old[cnt]+robot
+
+                # try to build the same robot next time round if failed to build it
+                step,minerals,robots,max_geodes = calculate_geodes_recursive32(minerals_old.copy(),robots_old.copy(),blueprint,step_old,max_geodes,target_robots=[target_robot])
+            
+    if minerals[3]>max_geodes:
+        max_geodes = minerals[3]
+
+    return step,minerals,robots,max_geodes
     
-#     for cnt,robot in enumerate(robots):
-#                 minerals[cnt]=minerals[cnt]+robot
-
-#     if step<=10:
-#         print(f"Minute: {step}, Target robot: {target_robot}, Minerals: {minerals}")
-#         if step>=8:
-#             for target_robot in range(3):
-#                 simple_recursion(step,target_robot,minerals)
-#         else:
-#             simple_recursion(step,target_robot,minerals)
     
-#     return step
-
-# simple_recursion(step=step,target_robot=target_robot,minerals=minerals)
 
 
-# def geode_recursion(step,target_robot,minerals):
-#     step = step+1
+print(f"\n==== PART 2 ====\n")
+blueprint = blueprints[0]
+minerals=[0,0,0,0]
+robots=[1,0,0,0]
+target_robots=[0,1,2,3]
+step=0
+
+start_time = time.time()
+print(time.strftime("%H:%M:%S", time.localtime(start_time)))
+
+total_result = 1
+blueprint_cnt = 0
+
+for blueprint in blueprints[0:3]:
     
-#     for cnt,robot in enumerate(robots):
-#                 minerals[cnt]=minerals[cnt]+robot
+    blueprint_cnt = blueprint_cnt+1
 
-#     if step<=5:
-#         print(f"Minute: {step}, Target robot: {target_robot}, Minerals: {minerals}")
+    minerals=[0,0,0,0]
+    robots=[1,0,0,0]
+    target_robots=[0,1]
+    step=0
 
-#         if step>=2:
+    step,minerals,robots,max_geodes = calculate_geodes_recursive32(minerals=minerals.copy(),robots=robots.copy(),target_robots=target_robots,blueprint=blueprint,step=step,max_geodes=0)
 
-#             for target_robot in range(3):
-#                 geode_recursion(step,target_robot,minerals.copy())
-        
-#         else:
-#             geode_recursion(step,target_robot,minerals.copy())
-    
-#     return step
+    print(f"Best result from target_list for blueprint {blueprint_cnt}. Geodes: {max_geodes}, ID: {max_geodes*blueprint_cnt}. Time taken: {time.time()-start_time:0.2f}s.")
 
-# print("===Recursion===")
-# geode_recursion(step=0,target_robot=0,minerals=[0,0,0,0])
+    total_result = total_result*max_geodes
+
+print(f"Total result: {total_result}")
