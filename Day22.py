@@ -80,7 +80,7 @@ Follow the path given in the monkeys' notes. What is the final password?
 
 import re
 
-# Read in the blueprints
+# Read in the map
 file_name = r"day/22/input"
 rows=[]
 with open(file_name, "r") as file:
