@@ -79,7 +79,6 @@ Follow the path given in the monkeys' notes. What is the final password?
 """
 
 import re
-import numpy as np
 
 # Read in the blueprints
 file_name = r"day/22/input"
@@ -299,3 +298,268 @@ The final password is still calculated from your final position and facing from 
 
 Fold the map into a cube, then follow the path given in the monkeys' notes. What is the final password?
 """
+
+## create routing for cubes shape
+# 1. expand the space
+# 2. create the routing signals
+# 3. create the route command
+# 4. redefine end position
+
+
+def print_map2(map):
+    print('-'*(len(map)+2))
+    for row in map:
+        print(f"|{''.join(row)}|")
+    print('-'*(len(map)+2))
+
+
+class player2:
+    def __init__(self,row,column,direction):
+        self.row = row
+        self.column = column
+        self.direction = direction
+
+    def step_forwards(self):
+        self.direction = self.direction % 360
+        
+        if self.direction == 0:
+            self.row = (self.row-1)
+        elif self.direction == 90:
+            self.column = (self.column+1)
+        elif self.direction == 180:
+            self.row = (self.row+1)
+        elif self.direction == 270:
+            self.column = (self.column-1)
+        else:
+            print("Error with next_loc")
+
+    def step_backwards(self):
+        self.direction = (180+self.direction) % 360
+        self.step_forwards()
+        self.direction = (180+self.direction) % 360
+
+
+if file_name == "day/22/input_example":
+    box_size = 4
+    map_expanded_size = 6*box_size
+    displace_rows = box_size
+    displace_columns = box_size
+    mark = player2(1*box_size,3*box_size,90)
+else:
+    box_size = 50
+    map_expanded_size = 7*box_size
+    displace_rows = 2*box_size
+    displace_columns = 3*box_size
+    mark = player2(2*box_size,4*box_size,90)
+
+
+map_expanded = []
+for row in range(map_expanded_size):
+    map_expanded.append([" "]*map_expanded_size)
+
+map_filled_tmp = []
+for cnt,row in enumerate(map):
+    columns = len(row)
+    map_filled_tmp.append(list(row)+[" "]*(max_column-columns))
+
+print_map2(map_filled_tmp)
+
+for row in range(len(map_filled_tmp)):
+    for column in range(len(map_filled_tmp[0])):
+        map_expanded[row+displace_rows][column+displace_columns] = map_filled_tmp[row][column]
+
+print_map2(map_expanded)
+
+if file_name == "day/22/input_example":
+    start_point_row = box_size-1
+    start_point_column = 3*box_size
+    length = box_size
+    for point in range(length):
+        map_expanded[start_point_row-point][start_point_column+point]="c"
+
+    start_point_row = 3*box_size-1
+    start_point_column = 4*box_size
+    length = 2*box_size
+    for point in range(length):
+        map_expanded[start_point_row-point][start_point_column+point]="c"
+
+    start_point_row = 3*box_size
+    start_point_column = 3*box_size-1
+    length = 3*box_size
+    for point in range(length):
+        map_expanded[start_point_row+point][start_point_column-point]="c"
+
+    start_point_row = 2*box_size-1
+    start_point_column = 3*box_size-1
+    length = 2*box_size
+    for point in range(length):
+        map_expanded[start_point_row-point][start_point_column-point]="a"
+
+    start_point_row = 3*box_size-1
+    start_point_column = 1*box_size-1
+    length = 1*box_size
+    for point in range(length):
+        map_expanded[start_point_row-point][start_point_column-point]="a"
+
+    start_point_row = 3*box_size
+    start_point_column = 5*box_size
+    length = 1*box_size
+    for point in range(length):
+        map_expanded[start_point_row+point][start_point_column+point]="a"
+
+    start_point_row = 4*box_size
+    start_point_column = 3*box_size
+    length = 2*box_size
+    for point in range(length):
+        map_expanded[start_point_row+point][start_point_column+point]="a"
+
+else:
+    start_point_row = 2*box_size-1
+    start_point_column = 4*box_size
+    length = 2*box_size
+    for point in range(length):
+        map_expanded[start_point_row-point][start_point_column+point]="c"
+
+    start_point_row = 3*box_size
+    start_point_column = 6*box_size
+    length = box_size
+    for point in range(length):
+        map_expanded[start_point_row-point-1][start_point_column+point]="c"
+
+    start_point_row = 3*box_size
+    start_point_column = 5*box_size
+    length = 2*box_size
+    for point in range(length):
+        map_expanded[start_point_row+point][start_point_column+point]="a"
+
+    start_point_row = 4*box_size-1
+    start_point_column = 4*box_size-1
+    length = 4*box_size
+    for point in range(length):
+        map_expanded[start_point_row-point][start_point_column-point]="a"
+
+    start_point_row = 4*box_size
+    start_point_column = 3*box_size-1
+    length = 3*box_size
+    for point in range(length):
+        map_expanded[start_point_row+point][start_point_column-point]="c"
+
+    start_point_row = 5*box_size
+    start_point_column = 4*box_size
+    length = 1*box_size
+    for point in range(length):
+        map_expanded[start_point_row+point][start_point_column+point]="a"
+
+    start_point_row = 6*box_size
+    start_point_column = 3*box_size
+    length = 1*box_size
+    for point in range(length):
+        map_expanded[start_point_row+point][start_point_column+point]="a"
+
+
+print_map2(map_expanded)
+
+map_filled = map_expanded
+
+with open("day/22/output_map_expanded", "w") as f:
+    for row in map_filled:
+        for item in row:
+            f.write(item)
+        f.write("\n")
+
+for command in commands:
+    
+    # print_map2(map_expanded)
+    
+    # print(f"\n Command: {command}")
+    
+    start_r = mark.row
+    start_c = mark.column
+
+    if command=="R":
+        mark.direction = (mark.direction+90)%360
+
+    elif command=="L":
+        mark.direction = (mark.direction-90)%360
+
+    elif command.isnumeric():
+        
+        movements = int(command)
+        
+        print(f"Movements {movements} due {mark.direction} degrees from location: {mark.row},{mark.column}")
+        # print(f"Current location: {mark.row},{mark.column}")
+        for move in range(movements):
+            
+            start_row = mark.row
+            start_column = mark.column
+            start_direction = mark.direction
+
+            # step forwards
+            mark.step_forwards()
+
+            # continue to move forward if the cell is empty
+            while (map_filled[mark.row][mark.column]==" ") or (map_filled[mark.row][mark.column]=="a") or (map_filled[mark.row][mark.column]=="c"):
+            
+                if map_filled[mark.row][mark.column]=="c":
+                    if mark.direction==0:
+                        mark.direction = 270
+                    elif mark.direction==90:
+                        mark.direction = 180
+                    elif mark.direction==180:
+                        mark.direction = 90
+                    elif mark.direction==270:
+                        mark.direction = 0
+                    else:
+                        "Error with mark's direction"
+
+                if map_filled[mark.row][mark.column]=="a":
+                    if mark.direction==0:
+                        mark.direction = 90
+                    elif mark.direction==90:
+                        mark.direction = 0
+                    elif mark.direction==180:
+                        mark.direction = 270
+                    elif mark.direction==270:
+                        mark.direction = 180
+                    else:
+                        "Error with mark's direction"
+
+                mark.step_forwards()
+
+                if map_filled[mark.row][mark.column]=="#":
+                    mark.row = start_row
+                    mark.column = start_column
+                    mark.direction = start_direction
+
+            # step back again if a wall is hit
+            if map_filled[mark.row][mark.column]=="#":
+                mark.row = start_row
+                mark.column = start_column
+                mark.direction = start_direction
+
+            # print(f"New location: {mark.row},{mark.column}")
+            if (map_filled[mark.row][mark.column]!="c") and (map_filled[mark.row][mark.column]!="a"):
+                if mark.direction == 0:
+                    map_filled[mark.row][mark.column] = "^"
+                elif mark.direction == 90:
+                    map_filled[mark.row][mark.column] = ">"
+                elif mark.direction == 180:
+                    map_filled[mark.row][mark.column] = "v"
+                elif mark.direction == 270:
+                    map_filled[mark.row][mark.column] = "<"
+
+
+    else:
+        print(f"Error with command {command}")  
+
+
+print_map2(map_expanded)
+
+with open("day/22/output_map_expanded_complete", "w") as f:
+    for row in map_filled:
+        for item in row:
+            f.write(item)
+        f.write("\n")
+
+password = 1000*(mark.row+1-displace_rows) + 4*(mark.column+1-displace_columns) + int(((mark.direction-90)%360)/90)
+print(password)
