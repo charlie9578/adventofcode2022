@@ -338,17 +338,8 @@ To prove to the elephants your simulation is accurate, they want to know how tal
 How many units tall will the tower of rocks be after 2022 rocks have stopped falling?
 """
 
-# TODO: functionise things, speed up things by cropping the bottom when the full row is covered, find a pattern to avoid repetitions
-
-
 import numpy as np
-
-import shapely
-import shapely.affinity
-import shapely.ops
-
-from bokeh.models import ColumnDataSource
-from bokeh.plotting import figure, show
+import math
 
 # get the jet order
 file_name = r"day/17/input"
@@ -362,114 +353,117 @@ with open(file_name, "r") as file:
 print(jets)
 
 # create the shapes
-horizontal_line = shapely.Polygon([(0, 0), (4, 0), (4, 1),(0,1)])
-cross = shapely.Polygon([(0, 1), (1, 1), (1, 0), (2, 0), (2, 1), (3, 1), (3, 2), (2, 2), (2, 3), (1, 3), (1, 2), (0,2)])
-corner = shapely.Polygon([(0, 0), (3, 0), (3, 3), (2, 3), (2, 1), (0, 1)])
-vertical_line = shapely.Polygon([(0, 0), (0, 4), (1, 4),(1,0)])
-square = shapely.Polygon([(0, 0), (2, 0), (2, 2),(0,2)])
+horizontal_line = np.array([[1,1,1,1]])
+cross = np.array([[0,1,0],[1,1,1],[0,1,0]])
+corner = np.array([[0,0,1],[0,0,1],[1,1,1]])
+vertical_line = np.array([[1],[1],[1],[1]])
+square = np.array([[1,1],[1,1]])
 
 shapes = [horizontal_line,cross,corner,vertical_line,square]
+print(shapes)
 
-xs, ys = [], []
-
-cnt = 0
-for shape in shapes:
-    cnt = cnt + 1
-    xs = xs + [np.array(shape.boundary.coords.xy[1])+cnt*5]
-    ys = ys + [np.array(shape.boundary.coords.xy[0])]
-
-# xs = [list(polygon.boundary.coords.xy[0]) for polygon in shapes]
-# ys = [list(polygon.boundary.coords.xy[1]) for polygon in shapes]
-print(corner.boundary.coords.xy[0])
-print(corner.boundary.coords.xy[1])
-
-print(xs)
-print(ys)
-
-source = ColumnDataSource(dict(xs = xs, ys = ys))
-
-p = figure(title = 'Shapes', tools = 'pan, wheel_zoom, box_zoom, reset, hover, save',
-           width = int(700/4),
-           height = int(3000/4),
-           x_range = (0,7),
-           y_range = (0,30),
-           aspect_scale=1)
-
-p.patches(xs='ys', ys='xs', fill_alpha = 0.7, fill_color = 'green', line_color = 'black', line_width = 0.5, source = source)
-show(p)
+# create the initial tunnel
+tunnel = np.array([[1]+[0]*7+[1]]*50000+[[9]*9])
+print(tunnel)
 
 
-
-total_shapes = 5
-shape_cnt = 1
-start_height = 3
-start_height_delta = 3
-start_location = 2
-dead_shapes = []
-active_shape = shapes[0]
-active_shape = shapely.affinity.translate(active_shape, xoff=start_location, yoff=start_height)
-rock_cnt = 1
-descend = 0
-while rock_cnt < 2023:
+descent = -1
+height_tower_only = 1
+height_repetitions = 0
+repeat_descent = None
+repeat_shape = None
+start_repeat_check = 10000
+end_seq_height = None
+rock_cnt = 0
+total_rocks = 1000000000000
+while rock_cnt < (total_rocks):
     
-    # determine jet movement
-    jet = jets[descend%len(jets)]
+    rock_cnt = rock_cnt+1
 
-    descend = descend + 1
+    active_shape = shapes[(rock_cnt-1)%len(shapes)]
 
-    if jet == ">":
-        if max(active_shape.boundary.coords.xy[0])<7:
-            xoff = 1
-        else:
-            xoff = 0
-    elif jet == "<":
-        if min(active_shape.boundary.coords.xy[0])>0:
-            xoff = -1
-        else:
-            xoff = 0
-    else:
-        print("jet error")
+    # print(active_shape)
+
+    x_loc = 3
+    y_loc = tunnel.shape[0]-height_tower_only-active_shape.shape[0]-3
+
+    falling = True
+    while falling:
+
+        # determine jet movement
+        descent = (descent + 1)%len(jets)
+        jet = jets[descent]
+        
+
+        # jet push
+        if jet == ">":
+            x_loc = x_loc+1
+            tunnel_section = tunnel[y_loc:y_loc+active_shape.shape[0],x_loc:x_loc+active_shape.shape[1]]
+            if np.multiply(active_shape,tunnel_section).sum()>=1:
+                x_loc = x_loc-1
+
+        elif jet == "<":
+            x_loc = x_loc-1
+            tunnel_section = tunnel[y_loc:y_loc+active_shape.shape[0],x_loc:x_loc+active_shape.shape[1]]
+            if np.multiply(active_shape,tunnel_section).sum()>=1:
+                x_loc = x_loc+1
+
+        if rock_cnt==42:
+            print(f"Jet moved: {jet}")
+            tunnel_tmp = tunnel.copy()
+            tunnel_tmp[y_loc:y_loc+active_shape.shape[0],x_loc:x_loc+active_shape.shape[1]] = tunnel_tmp[y_loc:y_loc+active_shape.shape[0],x_loc:x_loc+active_shape.shape[1]]+active_shape*(rock_cnt%len(shapes)+2)
+            print(tunnel_tmp)
+
+        # rock descent
+        y_loc = y_loc + 1
+        tunnel_section = tunnel[y_loc:y_loc+active_shape.shape[0],x_loc:x_loc+active_shape.shape[1]]
+
+        # stop falling if hits the bottom or another shape
+        if np.multiply(active_shape,tunnel_section).sum()>1:
+            y_loc = y_loc - 1
+            if height_tower_only<tunnel.shape[0]-y_loc:
+                height_tower_only = tunnel.shape[0]-y_loc
+            tunnel[y_loc:y_loc+active_shape.shape[0],x_loc:x_loc+active_shape.shape[1]] = tunnel[y_loc:y_loc+active_shape.shape[0],x_loc:x_loc+active_shape.shape[1]]+active_shape*(rock_cnt%len(shapes)+2)
+            # print(tunnel)
+            falling = False
+
+    print(f"{rock_cnt} rocks have fallen, with tower height: {(height_tower_only-1)+height_repetitions}, descent: {descent}, shape: {(rock_cnt-1)%len(shapes)}")
+
+    if rock_cnt==start_repeat_check:
+        # print(f"{rock_cnt} rocks have fallen, with tower height: {(height_tower_only-1)+height_repetitions}, descent: {descent}, shape: {(rock_cnt-1)%len(shapes)}")
+        repeat_descent = descent
+        repeat_shape = (rock_cnt-1)%len(shapes)
+        start_seq_repeat = rock_cnt
+        start_seq_height = height_tower_only-1
+        top = (tunnel>0).argmax(axis=0)[1:-1] - min((tunnel>0).argmax(axis=0)[1:-1])
+        
+    if rock_cnt>start_repeat_check and end_seq_height==None:
+        if descent==repeat_descent and (rock_cnt-1)%len(shapes)==repeat_shape:
+            if np.array_equal((tunnel>0).argmax(axis=0)[1:-1] - min((tunnel>0).argmax(axis=0)[1:-1]),top):
+                # print(f"{rock_cnt} rocks have fallen, with tower height: {(height_tower_only-1)+height_repetitions}, descent: {descent}, shape: {(rock_cnt-1)%len(shapes)}")
+                end_seq_repeat = rock_cnt
+                end_seq_height = height_tower_only-1
+                repetitions = math.floor((1000000000000-rock_cnt)/(end_seq_repeat-start_seq_repeat))-1
+                rock_cnt = rock_cnt + repetitions*(end_seq_repeat-start_seq_repeat)
+                height_repetitions = repetitions*(end_seq_height-start_seq_height)
+                print(f"Descent: {descent}, shape: {repeat_shape}, start seq: {start_seq_repeat}, start height: {start_seq_height}, end seq: {end_seq_repeat}, end height: {end_seq_height}")
+                print(top,(tunnel>0).argmax(axis=0)[1:-1] - min((tunnel>0).argmax(axis=0)[1:-1]))
+                
+print(f"{rock_cnt} rocks have fallen, with tower height: {(height_tower_only-1)+height_repetitions}, descent: {descent}, shape: {(rock_cnt-1)%len(shapes)}")
 
 
-    # jet movement
-    active_shape = shapely.affinity.translate(active_shape, xoff=xoff, yoff=0)
-    
-    # check if jet cause the shape to hit another one
-    if len(dead_shapes) > 0:
-        if active_shape.intersection(dead_shape).area>0:
-            active_shape = shapely.affinity.translate(active_shape, xoff=-xoff, yoff=0)
+"""
+Your puzzle answer was 3184.
 
-    # fall movement
-    active_shape = shapely.affinity.translate(active_shape, xoff=0, yoff=-1)
-    
-    # check if fall brings shape to rest on another shape
-    if len(dead_shapes) > 0:
-        if active_shape.intersection(dead_shape).area>0:
-            active_shape = shapely.affinity.translate(active_shape, xoff=0, yoff=+1)
-            dead_shapes = dead_shapes + [active_shape]
-            dead_shape = shapely.ops.unary_union(dead_shapes)
-            start_height = max(dead_shape.exterior.coords.xy[1])+start_height_delta
-            active_shape = shapes[shape_cnt%total_shapes]
-            shape_cnt = shape_cnt+1
-            active_shape = shapely.affinity.translate(active_shape, xoff=start_location, yoff=start_height)
+The first half of this puzzle is complete! It provides one gold star: *
+--- Part Two ---
 
-            rock_cnt = rock_cnt+1
+The elephants are not impressed by your simulation. They demand to know how tall the tower will be after 1000000000000 rocks have stopped! Only then will they feel confident enough to proceed through the cave.
 
-            print(f"rocks: {rock_cnt} height: +{start_height-start_height_delta}")
+In the example above, the tower would be 1514285714288 units tall!
 
+How tall will the tower be after 1000000000000 rocks have stopped?
 
-    # check if fall brings shape to rest on the bottom
-    if min(active_shape.exterior.coords.xy[1])<0:
-        active_shape = shapely.affinity.translate(active_shape, xoff=0, yoff=+1)
-        dead_shapes = dead_shapes + [active_shape]
-        dead_shape = shapely.ops.unary_union(dead_shapes)
-        start_height = max(dead_shape.exterior.coords.xy[1])+start_height_delta
-        active_shape = shapes[shape_cnt%total_shapes]
-        shape_cnt = shape_cnt+1
-        active_shape = shapely.affinity.translate(active_shape, xoff=start_location, yoff=start_height)
+Puzzle answer: 1577077363915
+"""    
 
-    
-    
-
-
-    

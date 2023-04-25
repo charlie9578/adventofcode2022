@@ -167,3 +167,23 @@ def decimal_to_snafu(decimal):
 
 
 print(decimal_to_snafu(total))
+
+
+"""
+Your puzzle answer was 2==0=0===02--210---1.
+
+The first half of this puzzle is complete! It provides one gold star: *
+--- Part Two ---
+
+The hot air balloons quickly carry you to the North Pole. As soon as you land, most of the expedition is escorted directly to a small building attached to the reindeer stables.
+
+The head smoothie chef has just finished warming up the industrial-grade smoothie blender as you arrive. It will take 50 stars to fill the blender. The expedition Elves turn their attention to you, and you begin emptying the fruit from your pack onto the table.
+
+As you do, a very young Elf - one you recognize from the expedition team - approaches the table and holds up a single star fruit he found. The head smoothie chef places it in the blender.
+
+Only 49 stars to go.
+
+You don't have enough stars to fill the blender, though. You need 2 more.
+
+Although it hasn't changed, you can still get your puzzle input.
+"""
