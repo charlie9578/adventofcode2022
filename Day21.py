@@ -111,7 +111,10 @@ In the above example, the number you need to yell to pass root's equality test i
 What number do you yell to pass root's equality test?
 """
 
-file_name = r"day/21/input_example"
+import re
+
+print("=======PART2========")
+file_name = r"day/21/input"
 monkey_dict={}
 with open(file_name, "r") as file:
 
@@ -120,42 +123,160 @@ with open(file_name, "r") as file:
         calc = line.split(":")[1].strip()
         monkey_dict[monkey] = calc
 
-monkey_dict["humn"] = "humn + humn"
+monkey_dict["humn"] = "humn"
+monkey_dict["root"] = monkey_dict["root"].replace("+","=")
+
 print(monkey_dict)
 
-for x in range(5000):
+for x in range(5):
     print(monkey_dict)
 
     for monkey in monkey_dict:
-        #print(f"{monkey} : {monkey_dict[monkey]}")
+        print(f"{monkey} : {monkey_dict[monkey]}")
         #print(monkey_dict)
+        # monkey_dict[monkey] = monkey_dict[monkey].replace(" ","")
 
-        if not(monkey_dict[monkey].isnumeric()):
-            #print(monkey_dict[monkey])
-            part_1 = monkey_dict[monkey].split(" ")[0]
-            operator = monkey_dict[monkey].split(" ")[1]
-            part_2 = monkey_dict[monkey].split(" ")[2]
+        if not(monkey=='humn'):
+            print(monkey_dict[monkey])
+            # parts = re.split("\+|\-|\*|\/|=|\(|\)", monkey_dict[monkey])
+            parts = monkey_dict[monkey].split(" ")
+            print(parts)
+            combo = ""
+            for part in parts:
+                if not(part.isnumeric()) and (part not in ["+","-","*","/","=","(",")"]):
+                    part = "( "+monkey_dict[part]+" )"
+                combo = combo+" "+part
+                
 
-            if not(part_1.isnumeric()) and monkey_dict[part_1].isnumeric():
-                part_1 = monkey_dict[part_1]
+            monkey_dict[monkey] = combo[1:]
 
-            if not(part_2.isnumeric()) and monkey_dict[part_2].isnumeric():
-                part_2 = monkey_dict[part_2]
-
-            if part_1.isnumeric() and part_2.isnumeric():
-                if operator == "+":
-                    monkey_dict[monkey] = str(int(int(part_1)+int(part_2)))
-                elif operator == "-":
-                    monkey_dict[monkey] = str(int(int(part_1)-int(part_2)))
-                elif operator == "*":
-                    monkey_dict[monkey] = str(int(int(part_1)*int(part_2)))
-                elif operator == "/":
-                    monkey_dict[monkey] = str(int(int(part_1)/int(part_2)))
-                else:
-                    print("operator error")
-            else:
-                monkey_dict[monkey] = f"{part_1} {operator} {part_2}"
-
-print(monkey_dict)
 
 print(monkey_dict["root"])
+
+LHS = monkey_dict["root"].split("=")[0].strip()#.split(" ")
+RHS = monkey_dict["root"].split("=")[1]
+RHS = eval(RHS)
+
+print(RHS)
+
+def numeric_solver(LHS,RHS,guess,order):
+
+    humn = guess
+    calculated_LHS = eval(LHS)
+    print(guess,calculated_LHS)
+    
+    if calculated_LHS==RHS:
+        return guess,calculated_LHS
+
+    if calculated_LHS<RHS:
+        guess,calculated_LHS = numeric_solver(LHS, RHS,guess=int(guess-order),order=int(order/10))
+    else:
+        guess,calculated_LHS = numeric_solver(LHS, RHS,guess=int(guess+order),order=order)
+
+    if calculated_LHS==RHS:
+        return guess,calculated_LHS
+
+humn = numeric_solver(LHS,RHS,0,100000000000000)[0]
+
+print(eval(LHS),RHS)
+
+print(f"Part 2 answer: {humn}")
+
+"Your puzzle answer was 3451534022348."
+
+
+## Failed Analytic Approach!
+
+# print(humn)
+# first_right_bracket = humn.index(")")
+# corresponding_left_bracket = first_right_bracket-humn[first_right_bracket::-1].index("(")
+# print(humn[first_right_bracket::-1])
+# print(corresponding_left_bracket, first_right_bracket)
+# print(humn[corresponding_left_bracket+1: first_right_bracket])
+# print("".join(humn[corresponding_left_bracket+1: first_right_bracket]))
+# str_inside_brackets= "".join(humn[corresponding_left_bracket+1: first_right_bracket])
+# inside_brackets = eval(str_inside_brackets)
+# print(inside_brackets)
+# del humn[first_right_bracket]
+# del humn[corresponding_left_bracket]
+# humn.insert(inside_brackets,corresponding_left_bracket)
+# print(humn)
+
+# def evaluator(equation):
+#     first_right_bracket = equation.index(")")
+#     # print(first_right_bracket)
+#     corresponding_left_bracket = first_right_bracket-equation[first_right_bracket::-1].index("(")
+#     # print(corresponding_left_bracket)
+#     str_inside_brackets= "".join(equation[corresponding_left_bracket+1: first_right_bracket])
+#     # print(str_inside_brackets)
+#     if str_inside_brackets=="humn":
+#         inside_brackets="humn"
+#     else:
+#         inside_brackets = str(eval(str_inside_brackets))
+#     # print(inside_brackets)
+#     # print(equation)
+#     # print("del")
+#     del equation[corresponding_left_bracket:first_right_bracket+1]
+#     # print(equation)
+#     equation.insert(corresponding_left_bracket,inside_brackets)
+#     # print(equation)
+#     return equation
+
+
+# def solver(LHS,RHS):
+#     if LHS[0].isnumeric():
+#         if LHS[1] == "+":
+#             RHS = eval(str(RHS)+"-"+LHS[0])
+#         elif LHS[1] == "-":
+#             RHS = eval(str(RHS)+"+"+LHS[0])
+#         elif LHS[1] == "*":
+#             RHS = eval(str(RHS)+"/"+LHS[0])
+            
+#         del LHS[:2]
+#         return LHS,RHS
+
+#     elif LHS[-1].isnumeric():
+#         if LHS[-2] == "+":
+#             RHS = eval(str(RHS)+"-"+LHS[-1])            
+#         elif LHS[-2] == "-":
+#             RHS = eval(str(RHS)+"+"+LHS[-1])
+#         elif LHS[-2] == "*":
+#             RHS = eval(str(RHS)+"/"+LHS[-1])
+#         elif LHS[-2] == "/":
+#             RHS = eval(str(RHS)+"*"+LHS[-1])
+            
+#         del LHS[-2:]
+#         return LHS,RHS
+
+
+#     right_bracket = len(LHS)-LHS[::-1].index(")")-1
+
+#     cnt_bracket=0
+#     for bracket_index,bracket in enumerate(LHS[right_bracket::-1]):
+#         if bracket=="(":
+#             cnt_bracket = cnt_bracket+1
+#         elif bracket==")":
+#             cnt_bracket = cnt_bracket-1
+        
+#         if cnt_bracket==0:
+#             break
+
+#     left_bracket = len(LHS[right_bracket::-1])-bracket_index-1
+    
+#     print(left_bracket,right_bracket)
+
+#     del LHS[right_bracket]
+#     del LHS[left_bracket]
+    
+#     return LHS,RHS
+
+# print("Fn")
+# print(LHS)
+
+# for a in range(9):
+#     LHS = evaluator(LHS)
+#     print(LHS)
+
+# for a in range(20):
+#     LHS,RHS = solver(LHS,RHS)
+#     print(LHS,RHS)
